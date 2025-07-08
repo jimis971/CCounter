@@ -5,17 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Калькулятор калорий блюда</title>
   <style>
+    :root {
+      --primary-color: #007bff;
+      --danger-color: #dc3545;
+      --success-color: #28a745;
+      --font-base: 16px;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background-color: #f8f9fa;
       margin: 0;
       padding: 20px;
+      font-size: var(--font-base);
     }
+
     h1 {
       text-align: center;
       color: #333;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
     }
+
     .container {
+      width: 100%;
       max-width: 900px;
       margin: 0 auto;
       background: #fff;
@@ -23,69 +36,146 @@
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+
+    .form-group label {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .form-group input {
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    @media (min-width: 600px) {
+      .form-group {
+        flex-direction: row;
+        align-items: center;
+      }
+      .form-group label {
+        width: 180px;
+        margin-bottom: 0;
+      }
+      .form-group input {
+        flex: 1;
+      }
+    }
+
+    .btn {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      min-height: 48px;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-delete {
+      background-color: var(--danger-color);
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      min-height: 48px;
+    }
+
+    .btn-delete:hover {
+      background-color: #a71d2a;
+    }
+
+    .btn-new {
+      background-color: var(--success-color);
+    }
+
+    .btn-new:hover {
+      background-color: #1e7e34;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      min-width: 600px;
     }
+
     th, td {
       border: 1px solid #ddd;
       padding: 8px;
       text-align: center;
+      font-size: 1rem;
     }
+
     th {
-      background-color: #007bff;
+      background-color: var(--primary-color);
       color: white;
     }
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 8px;
-      margin: 5px 0;
-      box-sizing: border-box;
-    }
-    .btn {
-      background-color: #007bff;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .btn:hover {
-      background-color: #0056b3;
-    }
-    .btn-delete {
-      background-color: #dc3545;
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn-delete:hover {
-      background-color: #a71d2a;
-    }
-    .total {
-      margin-top: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      text-align: right;
-    }
+
     td[contenteditable="true"] {
       background-color: #f1f9ff;
     }
+
     .bottom-buttons {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 10px;
       margin-top: 20px;
     }
-    .btn-new {
-      background-color: #28a745;
+
+    @media (min-width: 600px) {
+      .bottom-buttons {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
     }
-    .btn-new:hover {
-      background-color: #1e7e34;
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .dish-weight-container {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 600px) {
+      .dish-weight-container {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+
+    .calories-result {
+      margin-top: 20px;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      text-align: right;
     }
   </style>
 </head>
@@ -94,38 +184,72 @@
     <h1>Калькулятор калорий блюда</h1>
 
     <div id="ingredient-form">
-      <input type="text" id="name" placeholder="Название ингредиента" />
-      <input type="number" id="weight" placeholder="Масса, г" min="0" />
-      <input type="number" id="calories" placeholder="Ккал на 100 г" min="0" />
+      <div class="form-group">
+        <label for="name">Название ингредиента:</label>
+        <input type="text" id="name" />
+      </div>
+      <div class="form-group">
+        <label for="weight">Масса, г:</label>
+        <input type="number" id="weight" min="0" />
+      </div>
+      <div class="form-group">
+        <label for="calories">Ккал на 100 г:</label>
+        <input type="number" id="calories" min="0" />
+      </div>
       <button class="btn" onclick="addIngredient()">Добавить ингредиент</button>
     </div>
 
-    <table id="ingredients-table">
-      <thead>
-        <tr>
-          <th>№</th>
-          <th>Название</th>
-          <th>Масса (г)</th>
-          <th>Ккал на 100 г</th>
-          <th>Ккал всего</th>
-          <th>Действия</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Строки будут добавляться сюда -->
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table id="ingredients-table">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Название</th>
+            <th>Масса (г)</th>
+            <th>Ккал на 100 г</th>
+            <th>Ккал всего</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Строки будут добавляться сюда -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="toggle-container">
+      <label for="isCooked">Блюдо готовится (испарение, ужарка):</label>
+      <input type="checkbox" id="isCooked" />
+    </div>
+
+    <div class="dish-weight-container">
+      <label for="dishWeight">Общий вес готового блюда (г):</label>
+      <input type="number" id="dishWeight" min="0" step="1" disabled />
+    </div>
 
     <div class="bottom-buttons">
       <button class="btn btn-new" onclick="newDish()">Новое блюдо</button>
-      <div class="total" id="totalCalories">
-        Итого: 0 ккал
-      </div>
+      <div class="calories-result" id="dishCaloriesPer100g"></div>
     </div>
   </div>
 
   <script>
     let ingredients = [];
+
+    document.getElementById('isCooked').addEventListener('change', function() {
+      const dishWeightInput = document.getElementById('dishWeight');
+      if (this.checked) {
+        dishWeightInput.disabled = false;
+      } else {
+        dishWeightInput.disabled = true;
+        dishWeightInput.value = '';
+      }
+      renderTable();
+    });
+
+    document.getElementById('dishWeight').addEventListener('input', () => {
+      calculateCaloriesPer100g();
+    });
 
     function addIngredient() {
       const name = document.getElementById('name').value.trim();
@@ -154,7 +278,8 @@
       const tbody = document.querySelector('#ingredients-table tbody');
       tbody.innerHTML = '';
 
-      let total = 0;
+      let totalCalories = 0;
+      let totalWeight = 0;
 
       ingredients.forEach((item, index) => {
         const row = document.createElement('tr');
@@ -168,18 +293,22 @@
           <td><button class="btn-delete" onclick="deleteIngredient(${index})">Удалить</button></td>
         `;
 
-        // Добавим слушатели на изменение содержимого ячеек
         row.querySelectorAll('[contenteditable="true"]').forEach(cell => {
-          cell.addEventListener('blur', (e) => {
+          cell.addEventListener('blur', () => {
             updateIngredient(index, cell.dataset.field, cell.textContent);
           });
         });
 
         tbody.appendChild(row);
-        total += item.totalCalories;
+        totalCalories += item.totalCalories;
+        totalWeight += item.weight;
       });
 
-      document.getElementById('totalCalories').textContent = `Итого: ${total.toFixed(2)} ккал`;
+      if (!document.getElementById('isCooked').checked) {
+        document.getElementById('dishWeight').value = totalWeight > 0 ? totalWeight.toFixed(0) : '';
+      }
+
+      calculateCaloriesPer100g();
     }
 
     function updateIngredient(index, field, value) {
@@ -187,17 +316,14 @@
         value = parseFloat(value);
         if (isNaN(value)) {
           alert('Введите корректное число!');
-          renderTable(); // откатить изменения
+          renderTable();
           return;
         }
       }
-
       ingredients[index][field] = value;
 
-      // Пересчитать калории
       const weight = parseFloat(ingredients[index].weight);
       const caloriesPer100g = parseFloat(ingredients[index].caloriesPer100g);
-
       ingredients[index].totalCalories = (weight * caloriesPer100g) / 100;
 
       renderTable();
@@ -213,6 +339,10 @@
     function newDish() {
       if (confirm('Вы уверены, что хотите начать новое блюдо? Все данные будут удалены.')) {
         ingredients = [];
+        document.getElementById('isCooked').checked = false;
+        document.getElementById('dishWeight').value = '';
+        document.getElementById('dishWeight').disabled = true;
+        document.getElementById('dishCaloriesPer100g').textContent = '';
         renderTable();
         clearForm();
       }
@@ -222,6 +352,26 @@
       document.getElementById('name').value = '';
       document.getElementById('weight').value = '';
       document.getElementById('calories').value = '';
+    }
+
+    function calculateCaloriesPer100g() {
+      let totalCalories = ingredients.reduce((sum, item) => sum + item.totalCalories, 0);
+      let dishWeight = 0;
+
+      if (document.getElementById('isCooked').checked) {
+        dishWeight = parseFloat(document.getElementById('dishWeight').value);
+      } else {
+        dishWeight = ingredients.reduce((sum, item) => sum + item.weight, 0);
+      }
+
+      const resultDiv = document.getElementById('dishCaloriesPer100g');
+
+      if (!isNaN(dishWeight) && dishWeight > 0) {
+        const caloriesPer100g = (totalCalories / dishWeight) * 100;
+        resultDiv.textContent = `Калорийность блюда: ${caloriesPer100g.toFixed(2)} ккал / 100 г`;
+      } else {
+        resultDiv.textContent = '';
+      }
     }
   </script>
 </body>
